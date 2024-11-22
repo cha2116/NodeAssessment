@@ -26,6 +26,28 @@ app.use((req, res, next) => {
 
 app.use('/api/v1/movies', moviesRouter);
 
+app.all('*', (req, res, next) => {
+	// res.status(404).json({
+	// 	status: 'Fail',
+	// 	message: `Can't find ${req.originalUrl} on the server!`,
+	// });
+
+	const err = new Error(`Can't find ${req.originalUrl} on the server!`);
+	err.status = 'Fail';
+	err.statusCode = 404;
+
+	next(err);
+});
+
+app.use((error, req, res, next) => {
+	error.statusCode = error.statusCode || 500;
+	error.status = error.status || 'error';
+	res.status(statusCode).json({
+		status: statusCode,
+		message: error.message,
+	});
+});
+
 app.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT}`);
 });
